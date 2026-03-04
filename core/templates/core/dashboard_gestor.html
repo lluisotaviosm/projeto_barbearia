@@ -1,0 +1,155 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+
+    <div class="mb-10">
+        <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-red-300">
+            Painel do Gestor
+        </h1>
+        <p class="text-gray-400 mt-2">Visão geral da barbearia e administração da equipe</p>
+    </div>
+
+    {% if messages %}
+    <div class="mb-8">
+        {% for message in messages %}
+        <div
+            class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-500/10 border border-red-500/50 text-red-400{% else %}bg-green-500/10 border border-green-500/50 text-green-400{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 1. Cards de Resumo Geral -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div class="bg-dark-800 border-2 border-green-500/30 rounded-2xl p-8 relative overflow-hidden group">
+            <div
+                class="absolute right-0 top-0 w-32 h-32 bg-green-500/10 rounded-full blur-2xl group-hover:bg-green-500/20 transition-all">
+            </div>
+            <h3 class="text-gray-400 font-semibold mb-2">Faturamento Global</h3>
+            <p class="text-5xl font-bold text-white tracking-tight">R$ {{ receita_total|floatformat:2 }}</p>
+            <p class="text-sm text-green-400 mt-4 flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+                Trabalhos Concluídos: {{ agendamentos_concluidos }}
+            </p>
+        </div>
+
+        <div class="bg-dark-800 border border-gray-800 rounded-2xl p-8">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-gray-400 font-semibold mb-2">Equipe Ativa</h3>
+                    <p class="text-4xl font-bold text-white">{{ barbeiros.count }} Profissionais</p>
+                </div>
+                <div class="w-16 h-16 bg-dark-900 rounded-full flex items-center justify-center border border-gray-700">
+                    <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                </div>
+            </div>
+            <!-- Lista rápida para excluir -->
+            <div class="space-y-2 mt-4 max-h-32 overflow-y-auto custom-scrollbar">
+                {% for b in barbeiros %}
+                <div
+                    class="flex justify-between items-center text-sm bg-dark-900 p-2 rounded-lg border border-gray-800">
+                    <span class="text-gray-300 font-semibold">{{ b.username|title }}</span>
+                    <a href="{% url 'excluir_barbeiro' b.id %}"
+                        onclick="return confirm('ATENÇÃO: Deseja realmente excluir o barbeiro {{b.username}} do sistema?');"
+                        class="text-red-500 hover:text-red-400 flex items-center gap-1 transition-colors px-2 py-1 rounded-md hover:bg-red-500/10">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-gray-500 text-xs text-center py-2">Sem equipe.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Área de Grid Secundária: Adicionar Barbeiro & Próximos Agendamentos Globais -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Formulário Adicionar Barbeiro -->
+        <div class="lg:col-span-1 border border-gray-800 bg-dark-800 p-6 rounded-2xl h-fit">
+            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                <svg class="w-5 h-5 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Novo Barbeiro
+            </h2>
+            <form method="POST" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label class="block text-gray-400 text-sm mb-1">Nome de Usuário</label>
+                    <input type="text" name="username" required
+                        class="w-full bg-dark-900 border border-gray-700 text-white rounded-lg px-4 py-2 focus:border-gold-400 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-gray-400 text-sm mb-1">E-mail</label>
+                    <input type="email" name="email" required
+                        class="w-full bg-dark-900 border border-gray-700 text-white rounded-lg px-4 py-2 focus:border-gold-400 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-gray-400 text-sm mb-1">Senha Padrão</label>
+                    <input type="password" name="password" required
+                        class="w-full bg-dark-900 border border-gray-700 text-white rounded-lg px-4 py-2 focus:border-gold-400 focus:outline-none">
+                </div>
+                <button type="submit"
+                    class="w-full bg-dark-900 border border-gold-500/50 text-gold-400 hover:bg-gold-500 hover:text-dark-900 font-bold py-3 rounded-lg transition-colors mt-4">
+                    Cadastrar Profissional
+                </button>
+            </form>
+        </div>
+
+        <!-- Lista Global de Agendamentos -->
+        <div class="lg:col-span-2 border border-gray-800 bg-dark-800 p-6 rounded-2xl">
+            <h2 class="text-xl font-bold text-white mb-6">Próximos Atendimentos (Global)</h2>
+            <div class="space-y-4 overflow-y-auto max-h-[500px] pr-2 custom-scrollbar">
+                {% for agendamento in proximos_agendamentos %}
+                <div
+                    class="bg-dark-900 border border-gray-700 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-dark-800 px-3 py-2 rounded-lg text-center border border-gray-700">
+                            <span class="block font-bold text-gray-300">{{ agendamento.data_hora|date:"d M" }}</span>
+                            <span class="text-gold-400 font-bold">{{ agendamento.data_hora|date:"H:i" }}</span>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">{{ agendamento.servico.nome }} - <span
+                                    class="text-gray-400 font-normal">Cliente: {{ agendamento.cliente.username|title
+                                    }}</span></p>
+                            <p class="text-sm text-blue-400 mt-1">Profissional: {{ agendamento.barbeiro.username|title
+                                }}</p>
+                        </div>
+                    </div>
+                    <div>
+                        {% if agendamento.status == 'pendente' %}
+                        <span
+                            class="px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-500 text-xs border border-yellow-500/20">Pendente</span>
+                        {% elif agendamento.status == 'concluido' %}
+                        <span
+                            class="px-3 py-1 rounded-full bg-green-500/10 text-green-500 text-xs border border-green-500/20">Concluído</span>
+                        {% else %}
+                        <span
+                            class="px-3 py-1 rounded-full bg-red-500/10 text-red-500 text-xs border border-red-500/20">Cancelado</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-gray-500 text-center py-8">Nenhum agendamento futuro no sistema.</p>
+                {% endfor %}
+            </div>
+            <p class="text-xs text-center mt-4 text-gray-600">Mostrando os 15 agendamentos mais próximos.</p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

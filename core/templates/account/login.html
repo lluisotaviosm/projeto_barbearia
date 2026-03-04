@@ -1,0 +1,73 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center p-4 relative overflow-hidden -mt-4">
+    <!-- Fundo abstrato dourado -->
+    <div
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gold-400/5 rounded-full blur-3xl -z-10">
+    </div>
+
+    <div class="w-full max-w-md bg-dark-800 border border-gray-800 p-8 rounded-2xl shadow-2xl z-10">
+        <div class="text-center mb-8">
+            <h1
+                class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gold-400 to-yellow-200 uppercase tracking-widest mb-2">
+                Entrar</h1>
+            <p class="text-gray-400">Acesse sua conta para fazer novos agendamentos</p>
+        </div>
+
+        {% if form.errors %}
+        <div
+            class="bg-red-500/10 border border-red-500/50 text-red-500 rounded-lg p-4 mb-6 text-sm text-center font-semibold">
+            {{ form.non_field_errors|default:"Nome de usuário ou senha incorretos. Tente novamente." }}
+        </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'account_login' %}" class="space-y-6">
+            {% csrf_token %}
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+
+            <div>
+                <label for="id_login" class="block text-gray-400 text-sm font-semibold mb-2">Usuário ou E-mail</label>
+                <input type="text" name="login" placeholder="Ex: lluisotaviosm" autocomplete="username" required
+                    id="id_login"
+                    class="w-full bg-dark-900 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-gold-400 focus:ring-1 focus:ring-gold-400 transition-colors">
+            </div>
+
+            <div>
+                <label for="id_password" class="block text-gray-400 text-sm font-semibold mb-2">Senha</label>
+                <input type="password" name="password" placeholder="Sua senha secreta" autocomplete="current-password"
+                    required id="id_password"
+                    class="w-full bg-dark-900 border border-gray-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-gold-400 focus:ring-1 focus:ring-gold-400 transition-colors">
+            </div>
+
+            <div class="flex items-center justify-between mt-2">
+                <label for="id_remember"
+                    class="flex items-center text-gray-400 cursor-pointer hover:text-white transition-colors">
+                    <input type="checkbox" name="remember" id="id_remember"
+                        class="mr-2 text-gold-500 bg-dark-900 border-gray-700 rounded focus:ring-gold-500 focus:ring-offset-dark-800 h-4 w-4">
+                    <span class="text-sm">Manter Conectado</span>
+                </label>
+                <a class="text-sm text-gold-500 hover:text-gold-400 transition-colors underline"
+                    href="{% url 'account_reset_password' %}">Esqueceu a senha?</a>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-gold-500 hover:bg-gold-400 text-dark-900 font-bold py-3.5 rounded-xl shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all duration-300 transform hover:-translate-y-0.5 text-lg mt-4">
+                Entrar no Sistema
+            </button>
+        </form>
+
+        <!-- Social Auth Removido temporariamente para limpar visual -->
+
+        <div class="mt-8 text-center border-t border-gray-800 pt-6">
+            <p class="text-gray-400 mb-2">Ainda não tem conta como cliente?</p>
+            <a href="{% url 'account_signup' %}"
+                class="text-gold-500 hover:text-gold-400 transition-colors font-bold uppercase tracking-wider underline">
+                Cadastre-se Agora
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="relative min-h-[calc(100vh-80px)] flex items-center justify-center -mt-8 overflow-hidden">
+    <!-- Efeito de Fundo -->
+    <div
+        class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1585747860715-2ba37e788b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=2074&q=80')] bg-cover bg-center opacity-20 Mix-blend-overlay">
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/80 to-transparent"></div>
+
+    <div class="relative z-10 container mx-auto px-4 py-16 text-center max-w-4xl">
+        <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
+            A Experiência <br />
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-yellow-200">
+                Premium
+            </span>
+            Que Você Merece
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-400 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+            Agende seu horário com os melhores profissionais e desfrute de um atendimento impecável do início ao fim.
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            <!-- Botão Cliente -->
+            <a href="{% if user.is_authenticated %}{% url 'dashboard_cliente' %}{% else %}{% url 'account_login' %}?next={% url 'dashboard_cliente' %}{% endif %}"
+                class="group relative overflow-hidden rounded-2xl bg-dark-800 border-2 border-gray-700 hover:border-gold-400 transition-all duration-500 p-8 flex flex-col items-center justify-center gap-4 cursor-pointer hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(212,175,55,0.15)]">
+                <div
+                    class="absolute inset-0 bg-gradient-to-br from-gold-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                </div>
+                <div
+                    class="w-16 h-16 rounded-full bg-dark-900 flex items-center justify-center border border-gray-700 group-hover:border-gold-500/50 transition-colors">
+                    <svg class="w-8 h-8 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </div>
+                <div class="text-center relative z-10">
+                    <h2 class="text-2xl font-bold text-white mb-2 group-hover:text-gold-400 transition-colors">Sou
+                        Cliente</h2>
+                    <p class="text-gray-400 text-sm">Quero agendar um horário</p>
+                </div>
+            </a>
+
+            <!-- Botão Barbeiro -->
+            <a href="{% url 'dashboard_barbeiro' %}"
+                class="group relative overflow-hidden rounded-2xl bg-dark-800 border-2 border-gray-700 hover:border-blue-500 transition-all duration-500 p-8 flex flex-col items-center justify-center gap-4 cursor-pointer hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(59,130,246,0.15)]">
+                <div
+                    class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                </div>
+                <div
+                    class="w-16 h-16 rounded-full bg-dark-900 flex items-center justify-center border border-gray-700 group-hover:border-blue-500/50 transition-colors">
+                    <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z">
+                        </path>
+                    </svg>
+                </div>
+                <div class="text-center relative z-10">
+                    <h2 class="text-2xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">Sou
+                        Barbeiro</h2>
+                    <p class="text-gray-400 text-sm">Acessar meu painel</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
