@@ -1,1 +1,1 @@
-web: gunicorn barbearia_prj.wsgi --log-file -
+web: python manage.py migrate && gunicorn barbearia_prj.wsgi
