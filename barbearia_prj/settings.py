@@ -94,7 +94,7 @@ WSGI_APPLICATION = 'barbearia_prj.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config(
         default=f"mysql://{os.getenv('DB_USER', 'root')}:{os.getenv('DB_PASSWORD', 'Monteiro03_')}@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '3306')}/{os.getenv('DB_NAME', 'barbearia_db')}",
-        engine='django.db.backends.mysql',  # Volte para este aqui!
+        engine='django.db.backends.mysql',  # Mudança aqui!
         conn_max_age=600,
     )
 }
