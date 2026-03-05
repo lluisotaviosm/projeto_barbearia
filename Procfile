@@ -1,1 +1,1 @@
-web: python manage.py migrate && python -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(username='admin').exists() or User.objects.create_superuser('admin', 'admin@example.com', 'suasenha123')" && gunicorn barbearia_prj.wsgi
+web: python manage.py migrate && python manage.py createsuperuser --noinput --username admin --email admin@email.com || true && gunicorn barbearia_prj.wsgi
