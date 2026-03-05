@@ -57,6 +57,7 @@ def dashboard_cliente(request):
 
 @login_required
 def novo_agendamento(request):
+    # Impede que barbeiros acessem a área de agendamento de cliente
     if request.user.is_barbeiro():
         return redirect('dashboard_barbeiro')
 
@@ -68,31 +69,35 @@ def novo_agendamento(request):
         barbeiro_id = request.POST.get('barbeiro_id')
         data_hora_str = request.POST.get('data_hora')
         
-        # Debug para o Log do Railway
-        print(f"DEBUG AGENDAMENTO: Servico={servico_id}, Barbeiro={barbeiro_id}, Data={data_hora_str}")
+        # Log de segurança para você ver no Railway o que está chegando do formulário
+        print(f"--- TENTATIVA DE AGENDAMENTO ---")
+        print(f"Servico ID: {servico_id} | Barbeiro ID: {barbeiro_id} | Data recebida: {data_hora_str}")
 
+        # 1. Verifica se todos os campos foram enviados
         if not all([servico_id, barbeiro_id, data_hora_str]):
-            messages.error(request, 'Por favor, preencha todos os campos.')
+            messages.error(request, 'Por favor, selecione o serviço, o barbeiro e o horário.')
             return redirect('novo_agendamento')
 
         try:
-            # Tratando variação de formato (com ou sem segundos)
-            if len(data_hora_str) > 16:
-                data_hora = timezone.make_aware(datetime.strptime(data_hora_str, '%Y-%m-%dT%H:%M:%S'))
-            else:
+            # 2. Tratamento flexível de data (resolve o problema dos segundos enviado por alguns browsers)
+            try:
+                # Tenta formato padrão: YYYY-MM-DDTHH:MM
                 data_hora = timezone.make_aware(datetime.strptime(data_hora_str, '%Y-%m-%dT%H:%M'))
+            except ValueError:
+                # Tenta formato com segundos: YYYY-MM-DDTHH:MM:SS
+                data_hora = timezone.make_aware(datetime.strptime(data_hora_str, '%Y-%m-%dT%H:%M:%S'))
             
-            # Validação de data passada
+            # 3. Validação: Não permite agendar no passado
             if data_hora < timezone.now():
-                messages.error(request, 'Escolha um horário futuro.')
+                messages.error(request, 'Não é possível agendar um horário que já passou.')
                 return redirect('novo_agendamento')
 
-            # Validação de expediente
+            # 4. Validação: Horário de expediente (09:00 às 18:00)
             if data_hora.hour < 9 or data_hora.hour >= 18:
-                messages.error(request, 'Atendimento apenas das 09:00 às 18:00.')
+                messages.error(request, 'A barbearia funciona apenas das 09:00 às 18:00.')
                 return redirect('novo_agendamento')
 
-            # Checar conflito
+            # 5. Validação: Conflito de agenda (Verifica se o barbeiro já está ocupado)
             conflito = Agendamento.objects.filter(
                 barbeiro_id=barbeiro_id, 
                 data_hora=data_hora,
@@ -100,10 +105,10 @@ def novo_agendamento(request):
             ).exists()
 
             if conflito:
-                messages.error(request, 'Este barbeiro já tem um cliente marcado para este horário exato.')
+                messages.error(request, 'Este barbeiro já possui um agendamento para este horário exato.')
                 return redirect('novo_agendamento')
             
-            # CRIANDO O AGENDAMENTO
+            # 6. Salvando no Banco de Dados
             Agendamento.objects.create(
                 cliente=request.user,
                 barbeiro_id=barbeiro_id,
@@ -112,15 +117,20 @@ def novo_agendamento(request):
                 status='pendente'
             )
             
-            messages.success(request, 'Tudo pronto! Seu horário foi reservado.')
+            messages.success(request, 'Sucesso! Seu horário foi reservado na Barbearia do Mineiro.')
             return redirect('dashboard_cliente')
             
         except ValueError as e:
-            print(f"ERRO DE DATA: {e}")
-            messages.error(request, 'Formato de data inválido. Tente selecionar novamente.')
-            return redirect('novo_agendamento')
+            print(f"ERRO DE FORMATO DE DATA: {e}")
+            messages.error(request, 'O formato da data é inválido. Tente selecionar novamente.')
+        except Exception as e:
+            print(f"ERRO DESCONHECIDO NO AGENDAMENTO: {e}")
+            messages.error(request, 'Ocorreu um erro interno. Tente novamente mais tarde.')
 
-    return render(request, 'core/novo_agendamento.html', {'servicos': servicos, 'barbeiros': barbeiros})
+    return render(request, 'core/novo_agendamento.html', {
+        'servicos': servicos, 
+        'barbeiros': barbeiros
+    })
 
 # --- VIEWS PROTEGIDAS (BARBEIRO / GESTOR) ---
 
