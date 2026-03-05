@@ -150,3 +150,11 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-3cc69.up.railway.app',
+]
+
+# Configurações extras de segurança para produção
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
