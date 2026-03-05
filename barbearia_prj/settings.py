@@ -161,3 +161,6 @@ CSRF_ALLOWED_ORIGINS = [
     'https://web-production-3cc69.up.railway.app',
 ]
 CORS_ALLOW_ALL_ORIGINS = True # Caso você esteja usando a biblioteca CORS
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
