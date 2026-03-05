@@ -153,8 +153,11 @@ STORAGES = {
 
 CSRF_TRUSTED_ORIGINS = [
     'https://web-production-3cc69.up.railway.app',
+    'https://*.railway.app',  # Isso aqui aceita qualquer subdomínio do Railway
 ]
 
-# Configurações extras de segurança para produção
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# Adicione estas duas linhas logo abaixo para garantir
+CSRF_ALLOWED_ORIGINS = [
+    'https://web-production-3cc69.up.railway.app',
+]
+CORS_ALLOW_ALL_ORIGINS = True # Caso você esteja usando a biblioteca CORS
