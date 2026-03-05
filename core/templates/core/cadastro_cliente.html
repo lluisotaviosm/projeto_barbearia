@@ -7,6 +7,12 @@
                     <h2 class="text-center mb-4">Crie sua Conta na Barbearia</h2>
                     <form method="post">
                         {% csrf_token %}
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <strong>Erro no cadastro:</strong>
+                                {{ form.errors }}
+                            </div>
+                        {% endif %}
                         {{ form.as_p }} <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
                     </form>
                     <p class="mt-3 text-center">
