@@ -162,5 +162,13 @@ CSRF_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_ALL_ORIGINS = True # Caso você esteja usando a biblioteca CORS
 
+# 1. Faz o Django fingir que enviou o e-mail (imprime no log)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# 2. Desativa a obrigatoriedade de confirmar e-mail para logar
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_REQUIRED = False
+
+# 3. Garante que o Django saiba onde cair após o cadastro
+LOGIN_REDIRECT_URL = '/'
+ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
