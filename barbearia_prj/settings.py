@@ -172,3 +172,5 @@ ACCOUNT_EMAIL_REQUIRED = False
 # 3. Garante que o Django saiba onde cair após o cadastro
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
+
+AUTH_USER_MODEL = 'usuarios.CustomUser'
