@@ -68,42 +68,57 @@ def novo_agendamento(request):
         barbeiro_id = request.POST.get('barbeiro_id')
         data_hora_str = request.POST.get('data_hora')
         
-        if servico_id and barbeiro_id and data_hora_str:
-            try:
+        # Debug para o Log do Railway
+        print(f"DEBUG AGENDAMENTO: Servico={servico_id}, Barbeiro={barbeiro_id}, Data={data_hora_str}")
+
+        if not all([servico_id, barbeiro_id, data_hora_str]):
+            messages.error(request, 'Por favor, preencha todos os campos.')
+            return redirect('novo_agendamento')
+
+        try:
+            # Tratando variação de formato (com ou sem segundos)
+            if len(data_hora_str) > 16:
+                data_hora = timezone.make_aware(datetime.strptime(data_hora_str, '%Y-%m-%dT%H:%M:%S'))
+            else:
                 data_hora = timezone.make_aware(datetime.strptime(data_hora_str, '%Y-%m-%dT%H:%M'))
-                
-                if data_hora < timezone.now():
-                    messages.error(request, 'Não é possível agendar em um horário no passado.')
-                    return redirect('novo_agendamento')
+            
+            # Validação de data passada
+            if data_hora < timezone.now():
+                messages.error(request, 'Escolha um horário futuro.')
+                return redirect('novo_agendamento')
 
-                hora_agendamento = data_hora.hour
-                if hora_agendamento < 9 or hora_agendamento >= 18:
-                    messages.error(request, 'Expediente: 09:00 às 18:00.')
-                    return redirect('novo_agendamento')
+            # Validação de expediente
+            if data_hora.hour < 9 or data_hora.hour >= 18:
+                messages.error(request, 'Atendimento apenas das 09:00 às 18:00.')
+                return redirect('novo_agendamento')
 
-                conflito = Agendamento.objects.filter(
-                    barbeiro_id=barbeiro_id, 
-                    data_hora=data_hora,
-                    status__in=['pendente', 'concluido']
-                ).exists()
+            # Checar conflito
+            conflito = Agendamento.objects.filter(
+                barbeiro_id=barbeiro_id, 
+                data_hora=data_hora,
+                status__in=['pendente', 'concluido']
+            ).exists()
 
-                if conflito:
-                    messages.error(request, 'Este horário já está reservado.')
-                    return redirect('novo_agendamento')
-                
-                Agendamento.objects.create(
-                    cliente=request.user,
-                    barbeiro_id=barbeiro_id,
-                    servico_id=servico_id,
-                    data_hora=data_hora,
-                    status='pendente'
-                )
-                
-                messages.success(request, 'Agendamento realizado com sucesso!')
-                return redirect('dashboard_cliente')
-                
-            except ValueError:
-                 messages.error(request, 'Formato de data inválido.')
+            if conflito:
+                messages.error(request, 'Este barbeiro já tem um cliente marcado para este horário exato.')
+                return redirect('novo_agendamento')
+            
+            # CRIANDO O AGENDAMENTO
+            Agendamento.objects.create(
+                cliente=request.user,
+                barbeiro_id=barbeiro_id,
+                servico_id=servico_id,
+                data_hora=data_hora,
+                status='pendente'
+            )
+            
+            messages.success(request, 'Tudo pronto! Seu horário foi reservado.')
+            return redirect('dashboard_cliente')
+            
+        except ValueError as e:
+            print(f"ERRO DE DATA: {e}")
+            messages.error(request, 'Formato de data inválido. Tente selecionar novamente.')
+            return redirect('novo_agendamento')
 
     return render(request, 'core/novo_agendamento.html', {'servicos': servicos, 'barbeiros': barbeiros})
 
