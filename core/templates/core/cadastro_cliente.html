@@ -1,22 +1,30 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} 
+
+{% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-body">
                     <h2 class="text-center mb-4">Crie sua Conta na Barbearia</h2>
+                    
                     <form method="post">
                         {% csrf_token %}
+
                         {% if form.errors %}
                             <div class="alert alert-danger">
-                                <strong>Erro no cadastro:</strong>
+                                <strong>⚠️ Erro no cadastro:</strong>
                                 {{ form.errors }}
                             </div>
                         {% endif %}
-                        {{ form.as_p }} <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
+
+                        {{ form.as_p }} 
+
+                        <button type="submit" class="btn btn-primary w-100 mt-3">Cadastrar</button>
                     </form>
+
                     <p class="mt-3 text-center">
-                        Já tem conta? <a href="{% url 'login' %}">Faça login aqui</a>
+                        Já tem conta? <a href="{% url 'account_login' %}">Faça login aqui</a>
                     </p>
                 </div>
             </div>

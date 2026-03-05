@@ -166,8 +166,9 @@ CORS_ALLOW_ALL_ORIGINS = True # Caso você esteja usando a biblioteca CORS
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # 2. Desativa a obrigatoriedade de confirmar e-mail para logar
+ACCOUNT_SIGNUP_FIELDS = ['email', 'username', 'password1', 'password2']
+ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-ACCOUNT_EMAIL_REQUIRED = False
 
 # 3. Garante que o Django saiba onde cair após o cadastro
 LOGIN_REDIRECT_URL = '/'
