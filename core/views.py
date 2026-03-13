@@ -17,9 +17,6 @@ def dashboard_cliente(request):
     agendamentos = Agendamento.objects.filter(cliente=request.user).order_by('-data', '-horario')
     return render(request, 'core/dashboard_cliente.html', {'agendamentos': agendamentos})
 
-from .forms import BarbeiroForm
-from django import forms
-
 @login_required
 def dashboard_barbeiro(request):
     if not request.user.is_staff and not hasattr(request.user, 'perfil_barbeiro'):
@@ -27,13 +24,14 @@ def dashboard_barbeiro(request):
         return redirect('home')
     
     context = {}
+    today = timezone.localdate()
     
     # Se for superuser, ele vê tudo consolidado
     if request.user.is_superuser:
         context['is_admin_only'] = not hasattr(request.user, 'perfil_barbeiro')
         context['barbeiros_lista'] = Barbeiro.objects.all()
         context['agendamentos_hoje'] = Agendamento.objects.filter(
-            data=datetime.date.today()
+            data=today
         ).order_by('barbeiro', 'horario')
         
         context['total_ganhos_geral'] = Agendamento.objects.filter(confirmado=True).aggregate(Sum('servico__preco'))['servico__preco__sum'] or 0
@@ -45,17 +43,17 @@ def dashboard_barbeiro(request):
         barbeiro = request.user.perfil_barbeiro
         context['barbeiro'] = barbeiro
         
+        # Filtro de hoje para o barbeiro logado
+        qs_hoje = Agendamento.objects.filter(barbeiro=barbeiro, data=today)
+        
         if not request.user.is_superuser: # Se for apenas barbeiro, vê apenas o dele
-            context['agendamentos_hoje'] = Agendamento.objects.filter(
-                barbeiro=barbeiro, 
-                data=datetime.date.today()
-            ).order_by('horario')
+            context['agendamentos_hoje'] = qs_hoje.order_by('horario')
         
         context['total_ganhos'] = Agendamento.objects.filter(barbeiro=barbeiro, confirmado=True).aggregate(Sum('servico__preco'))['servico__preco__sum'] or 0
         context['total_clientes'] = Agendamento.objects.filter(barbeiro=barbeiro).values('cliente').distinct().count() or 0
         context['total_atendimentos'] = Agendamento.objects.filter(barbeiro=barbeiro).count()
     
-    context['today'] = datetime.date.today()
+    context['today'] = today
     return render(request, 'core/dashboard_barbeiro.html', context)
 
 @login_required
