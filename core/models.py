@@ -28,6 +28,8 @@ class Agendamento(models.Model):
     servico = models.ForeignKey(Servico, on_delete=models.CASCADE)
     data = models.DateField()
     horario = models.TimeField()
+    status = models.CharField(max_length=20, default='PENDENTE')
+    forma_pagamento = models.CharField(max_length=50, blank=True, null=True)
     confirmado = models.BooleanField(default=False)
     criado_em = models.DateTimeField(auto_now_add=True)
 
