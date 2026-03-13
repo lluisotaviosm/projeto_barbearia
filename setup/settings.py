@@ -16,9 +16,10 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 CSRF_TRUSTED_ORIGINS = [
     'https://barbeariadomineiro.up.railway.app',
     'https://*.railway.app',
-    'http://barbeariadomineiro.up.railway.app',
-    'http://localhost:8000',
 ]
+
+# Essential for HTTPS on Railway
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
