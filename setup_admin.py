@@ -18,7 +18,7 @@ def create_official_admin():
             username='admin_monteiro',
             password=password,
             nome_completo='Luis Otavio (Dono)',
-            telefone='55' # Sera ajustado depois no painel
+            telefone='5511999999999' # Ajustado para formato oficial
         )
         print("CONTA CRIADA!")
     else:
@@ -26,8 +26,9 @@ def create_official_admin():
         user.is_superuser = True
         user.is_staff = True
         user.is_active = True
+        user.set_password(password) # FORCAR A SENHA
         user.save()
-        print(f"USUARIO {email} JA EXISTE. PERMISSOES ATUALIZADAS.")
+        print(f"USUARIO {email} JA EXISTE. SENHA E PERMISSOES ATUALIZADAS.")
 
     # Garantir que ele tambem seja Barbeiro no sistema
     Barbeiro.objects.get_or_create(

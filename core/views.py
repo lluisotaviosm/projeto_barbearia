@@ -181,15 +181,17 @@ def cancelar_agendamento(request, agendamento_id):
         if not cliente_cel.startswith('55'):
             cliente_cel = f"55{cliente_cel}"
             
-        cliente_nome = agendamento.cliente.nome_completo if agendamento.cliente.nome_completo else agendamento.cliente.username
+        cliente_nome = agendamento.cliente.nome_completo or agendamento.cliente.username
         
         mensagem = f"Olá {cliente_nome}, aqui é da BARBEARIA DO MINEIRO JR. Infelizmente precisamos reagendar seu horário de {agendamento.data.strftime('%d/%m/%Y')} às {agendamento.horario.strftime('%H:%M')}. Podemos conversar?"
         
         mensagem_encoded = urllib.parse.quote(mensagem)
-        link_whatsapp = f"https://wa.me/{cliente_cel}?text={mensagem_encoded}"
+        link_whatsapp = f"https://api.whatsapp.com/send?phone={cliente_cel}&text={mensagem_encoded}"
         
         agendamento.delete()
-        return redirect(link_whatsapp)
+        # Usamos HttpResponseRedirect para links externos de forma mais explicita
+        from django.http import HttpResponseRedirect
+        return HttpResponseRedirect(link_whatsapp)
     
     messages.error(request, "Você não tem permissão para cancelar este agendamento.")
     return redirect('home')
