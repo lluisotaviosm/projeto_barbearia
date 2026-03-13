@@ -16,6 +16,8 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 CSRF_TRUSTED_ORIGINS = [
     'https://barbeariadomineiro.up.railway.app',
     'https://*.railway.app',
+    'http://barbeariadomineiro.up.railway.app',
+    'http://localhost:8000',
 ]
 
 INSTALLED_APPS = [
