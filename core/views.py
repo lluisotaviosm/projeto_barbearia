@@ -7,7 +7,7 @@ import datetime
 
 def home(request):
     if request.user.is_authenticated:
-        if hasattr(request.user, 'perfil_barbeiro'):
+        if request.user.is_staff or hasattr(request.user, 'perfil_barbeiro'):
             return redirect('dashboard_barbeiro')
         return redirect('dashboard_cliente')
     return render(request, 'home.html')
