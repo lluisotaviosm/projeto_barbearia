@@ -2,77 +2,109 @@
 
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 py-12">
-    <!-- Header/Metrics -->
-    {% if not is_admin_only %}
+    <!-- Global Metrics for Admin -->
+    {% if user.is_superuser %}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div class="dark-card p-8 rounded-3xl border-l-4 border-[#d4af37]">
-            <p class="text-gray-500 text-sm uppercase tracking-wider mb-1">Saldo Total</p>
-            <h3 class="text-3xl font-bold text-white">R$ {{ total_ganhos }}</h3>
+        <div class="dark-card p-8 rounded-3xl border-l-4 border-[#d4af37] shadow-lg shadow-[#d4af37]/5">
+            <p class="text-gray-500 text-sm uppercase tracking-wider mb-1">Saldo Completo (Geral)</p>
+            <h3 class="text-3xl font-bold text-white">R$ {{ total_ganhos_geral|default:"0.00" }}</h3>
         </div>
         <div class="dark-card p-8 rounded-3xl">
-            <p class="text-gray-500 text-sm uppercase tracking-wider mb-1">Clientes Atendidos</p>
-            <h3 class="text-3xl font-bold text-white">{{ total_clientes }}</h3>
+            <p class="text-gray-500 text-sm uppercase tracking-wider mb-1">Total de Clientes</p>
+            <h3 class="text-3xl font-bold text-white">{{ total_clientes_geral }}</h3>
         </div>
         <div class="dark-card p-8 rounded-3xl">
-            <p class="text-gray-500 text-sm uppercase tracking-wider mb-1">Total Atendimentos</p>
-            <h3 class="text-3xl font-bold text-white">{{ total_atendimentos }}</h3>
+            <p class="text-gray-500 text-sm uppercase tracking-wider mb-1">Atendimentos Totais</p>
+            <h3 class="text-3xl font-bold text-white">{{ total_atendimentos_geral }}</h3>
         </div>
     </div>
-    {% endif %}
 
-    {% if user.is_superuser %}
+    <!-- Team Management (Demitir) -->
     <div class="mb-12">
-        <div class="dark-card p-8 rounded-3xl border-dashed border-2 border-[#d4af37]/30 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div>
-                <h3 class="text-xl font-bold mb-2">Painel de Gestão Admin</h3>
-                <p class="text-gray-500 text-sm">Como administrador, você pode cadastrar novos profissionais e gerenciar a barbearia.</p>
+        <h2 class="text-2xl font-bold mb-6">Gerenciar <span class="text-[#d4af37]">Time</span></h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for b in barbeiros_lista %}
+            <div class="dark-card p-6 rounded-2xl flex justify-between items-center group">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full gold-gradient flex items-center justify-center text-black font-bold text-xl">
+                        {{ b.user.username|first|upper }}
+                    </div>
+                    <div>
+                        <h4 class="font-bold">{% firstof b.user.nome_comple b.user.username %}</h4>
+                        <p class="text-xs text-gray-500">{{ b.user.email }}</p>
+                    </div>
+                </div>
+                <a href="{% url 'demitir_barbeiro' b.id %}" 
+                   onclick="return confirm('Tem certeza que deseja demitir este barbeiro? Esta ação é irreversível.')"
+                   class="text-red-500/30 group-hover:text-red-500 transition-colors p-2" title="Demitir Barbeiro">
+                    <i class="fas fa-user-minus"></i>
+                </a>
             </div>
-            <a href="{% url 'cadastrar_barbeiro' %}" class="btn-gold px-8 py-3 rounded-xl flex items-center gap-3">
-                <i class="fas fa-plus"></i> Cadastrar Barbeiro
+            {% endfor %}
+            <a href="{% url 'cadastrar_barbeiro' %}" class="dark-card p-6 rounded-2xl border-dashed border-2 border-[#d4af37]/20 flex flex-col items-center justify-center gap-2 hover:border-[#d4af37] group transition-all">
+                <i class="fas fa-plus text-[#d4af37]/50 group-hover:text-[#d4af37]"></i>
+                <span class="text-sm font-semibold text-gray-500 group-hover:text-white">Cadastrar Barbeiro</span>
             </a>
         </div>
     </div>
     {% endif %}
 
-    {% if not is_admin_only %}
-    <!-- Today's Schedule -->
+    {% if barbeiro and not user.is_superuser %}
+    <!-- Individual Metrics for regular Barber -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="dark-card p-8 rounded-3xl border-l-4 border-[#d4af37]">
+            <p class="text-gray-500 text-sm uppercase tracking-wider mb-1">Meu Saldo</p>
+            <h3 class="text-3xl font-bold text-white">R$ {{ total_ganhos }}</h3>
+        </div>
+        <div class="dark-card p-8 rounded-3xl">
+            <p class="text-gray-500 text-sm uppercase tracking-wider mb-1">Meus Clientes</p>
+            <h3 class="text-3xl font-bold text-white">{{ total_clientes }}</h3>
+        </div>
+        <div class="dark-card p-8 rounded-3xl">
+            <p class="text-gray-500 text-sm uppercase tracking-wider mb-1">Meus Atendimentos</p>
+            <h3 class="text-3xl font-bold text-white">{{ total_atendimentos }}</h3>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Common Schedule View -->
     <div class="flex justify-between items-center mb-8">
-        <h2 class="text-3xl font-bold">Agenda de <span class="text-[#d4af37]">Hoje</span></h2>
+        <h2 class="text-3xl font-bold">Agenda {% if user.is_superuser %}Geral{% else %}de Hoje{% endif %}</h2>
         <span class="text-gray-500">{{ today|date:"d \d\e F" }}</span>
     </div>
 
     <div class="space-y-4">
         {% for agendamento in agendamentos_hoje %}
-            <div class="dark-card p-6 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="dark-card p-6 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4 border-l-2 {% if user.is_superuser %}border-[#d4af37]/30{% endif %}">
                 <div class="flex items-center gap-6">
                     <div class="text-2xl font-bold text-[#d4af37] w-20 text-center">
                         {{ agendamento.horario|time:"H:i" }}
                     </div>
                     <div class="h-10 w-px bg-white/10 hidden md:block"></div>
                     <div>
-                        <h4 class="text-xl font-bold">{% firstof agendamento.cliente.nome_completo agendamento.cliente.username %}</h4>
+                        <div class="flex items-center gap-2 mb-1">
+                            <h4 class="text-xl font-bold">{% firstof agendamento.cliente.nome_completo agendamento.cliente.username %}</h4>
+                            {% if user.is_superuser %}
+                            <span class="text-[10px] bg-[#d4af37]/10 text-[#d4af37] px-2 py-0.5 rounded-full border border-[#d4af37]/20 uppercase">
+                                {{ agendamento.barbeiro }}
+                            </span>
+                            {% endif %}
+                        </div>
                         <p class="text-gray-500">{{ agendamento.servico.nome }} • R$ {{ agendamento.servico.preco }}</p>
                         <p class="text-xs text-gray-600 mt-1">{{ agendamento.cliente.telefone }}</p>
                     </div>
                 </div>
                 <div class="flex gap-4">
                     <a href="{% url 'cancelar_agendamento' agendamento.id %}" class="bg-red-900/20 text-red-500 px-6 py-2 rounded-xl text-sm font-semibold hover:bg-red-900/40 transition-all">
-                        Cancelar
+                        {% if user.is_superuser %}Remover{% else %}Cancelar{% endif %}
                     </a>
                 </div>
             </div>
         {% empty %}
             <div class="text-center py-20 border-2 border-dashed border-white/5 rounded-3xl text-gray-500">
-                Sem agendamentos para hoje.
+                Sem agendamentos no momento.
             </div>
         {% endfor %}
     </div>
-    {% else %}
-    <div class="text-center py-20">
-        <i class="fas fa-user-shield text-6xl text-[#d4af37]/20 mb-6"></i>
-        <h2 class="text-2xl font-bold mb-2">Painel de Administrador</h2>
-        <p class="text-gray-500">Use os links acima para gerenciar os barbeiros da plataforma.</p>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

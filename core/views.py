@@ -26,28 +26,36 @@ def dashboard_barbeiro(request):
         messages.error(request, "Você não possui perfil de barbeiro.")
         return redirect('home')
     
-    # Se for admin mas não tiver perfil, mostra dashboard vazio ou com opções de gestão
-    if not hasattr(request.user, 'perfil_barbeiro'):
-        return render(request, 'core/dashboard_barbeiro.html', {'is_admin_only': True})
+    context = {}
+    
+    # Se for superuser, ele vê tudo consolidado
+    if request.user.is_superuser:
+        context['is_admin_only'] = not hasattr(request.user, 'perfil_barbeiro')
+        context['barbeiros_lista'] = Barbeiro.objects.all()
+        context['agendamentos_hoje'] = Agendamento.objects.filter(
+            data=datetime.date.today()
+        ).order_by('barbeiro', 'horario')
+        
+        context['total_ganhos_geral'] = Agendamento.objects.filter(confirmado=True).aggregate(Sum('servico__preco'))['servico__preco__sum'] or 0
+        context['total_clientes_geral'] = Agendamento.objects.values('cliente').distinct().count() or 0
+        context['total_atendimentos_geral'] = Agendamento.objects.count()
 
-    barbeiro = request.user.perfil_barbeiro
+    # Dados específicos se for um barbeiro
+    if hasattr(request.user, 'perfil_barbeiro'):
+        barbeiro = request.user.perfil_barbeiro
+        context['barbeiro'] = barbeiro
+        
+        if not request.user.is_superuser: # Se for apenas barbeiro, vê apenas o dele
+            context['agendamentos_hoje'] = Agendamento.objects.filter(
+                barbeiro=barbeiro, 
+                data=datetime.date.today()
+            ).order_by('horario')
+        
+        context['total_ganhos'] = Agendamento.objects.filter(barbeiro=barbeiro, confirmado=True).aggregate(Sum('servico__preco'))['servico__preco__sum'] or 0
+        context['total_clientes'] = Agendamento.objects.filter(barbeiro=barbeiro).values('cliente').distinct().count() or 0
+        context['total_atendimentos'] = Agendamento.objects.filter(barbeiro=barbeiro).count()
     
-    agendamentos_hoje = Agendamento.objects.filter(
-        barbeiro=barbeiro, 
-        data=datetime.date.today()
-    ).order_by('horario')
-    
-    total_ganhos = Agendamento.objects.filter(barbeiro=barbeiro, confirmado=True).aggregate(Sum('servico__preco'))['servico__preco__sum'] or 0
-    total_clientes = Agendamento.objects.filter(barbeiro=barbeiro).values('cliente').distinct().count() or 0
-    total_atendimentos = Agendamento.objects.filter(barbeiro=barbeiro).count()
-    
-    context = {
-        'barbeiro': barbeiro,
-        'agendamentos_hoje': agendamentos_hoje,
-        'total_ganhos': total_ganhos,
-        'total_clientes': total_clientes,
-        'total_atendimentos': total_atendimentos,
-    }
+    context['today'] = datetime.date.today()
     return render(request, 'core/dashboard_barbeiro.html', context)
 
 @login_required
@@ -140,3 +148,18 @@ def cadastrar_barbeiro(request):
         form = BarbeiroForm()
     
     return render(request, 'core/cadastrar_barbeiro.html', {'form': form})
+
+    return render(request, 'core/cadastrar_barbeiro.html', {'form': form})
+
+@login_required
+def demitir_barbeiro(request, barbeiro_id):
+    if not request.user.is_superuser:
+        messages.error(request, "Acesso restrito.")
+        return redirect('home')
+    
+    barbeiro = get_object_or_404(Barbeiro, id=barbeiro_id)
+    user = barbeiro.user
+    barbeiro.delete()
+    user.delete()
+    messages.success(request, "Barbeiro removido com sucesso!")
+    return redirect('dashboard_barbeiro')
