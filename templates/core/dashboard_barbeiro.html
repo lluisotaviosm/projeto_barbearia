@@ -49,6 +49,11 @@
     </div>
     {% endif %}
 
+    <!-- DB Diagnostic -->
+    <div class="mt-12 pt-8 border-t border-white/5 text-center text-[10px] text-gray-700 uppercase tracking-[0.2em]">
+        Ambiente de Dados: <span class="{% if db_engine == 'PostgreSQL' %}text-green-500{% else %}text-red-500{% endif %}">{{ db_engine }}</span>
+    </div>
+
     {% if barbeiro and not user.is_superuser %}
     <!-- Individual Metrics for regular Barber -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
