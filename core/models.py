@@ -6,9 +6,11 @@ class Barbeiro(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='perfil_barbeiro')
     foto = models.ImageField(upload_to='barbeiros/', null=True, blank=True)
     bio = models.TextField(blank=True)
+    whatsapp_bot_key = models.CharField('Chave Bot WhatsApp', max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return self.user.nome_completo
+        nome = self.user.nome_completo if self.user.nome_completo else self.user.username
+        return nome
 
 class Servico(models.Model):
     nome = models.CharField(max_length=100)
@@ -39,4 +41,5 @@ class Agendamento(models.Model):
             raise ValidationError('Este barbeiro já possui um agendamento neste horário.')
 
     def __str__(self):
-        return f"{self.cliente.nome_completo} - {self.barbeiro} - {self.data} {self.horario}"
+        cliente_nome = self.cliente.nome_completo if self.cliente.nome_completo else self.cliente.username
+        return f"{cliente_nome} - {self.barbeiro} - {self.data} {self.horario}"

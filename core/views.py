@@ -6,6 +6,10 @@ from django.db.models import Sum, Count
 import datetime
 
 def home(request):
+    if request.user.is_authenticated:
+        if hasattr(request.user, 'perfil_barbeiro'):
+            return redirect('dashboard_barbeiro')
+        return redirect('dashboard_cliente')
     return render(request, 'home.html')
 
 @login_required
@@ -13,13 +17,20 @@ def dashboard_cliente(request):
     agendamentos = Agendamento.objects.filter(cliente=request.user).order_by('-data', '-horario')
     return render(request, 'core/dashboard_cliente.html', {'agendamentos': agendamentos})
 
+from .forms import BarbeiroForm
+from django import forms
+
 @login_required
 def dashboard_barbeiro(request):
-    try:
-        barbeiro = request.user.perfil_barbeiro
-    except Barbeiro.DoesNotExist:
+    if not request.user.is_staff and not hasattr(request.user, 'perfil_barbeiro'):
         messages.error(request, "Você não possui perfil de barbeiro.")
         return redirect('home')
+    
+    # Se for admin mas não tiver perfil, mostra dashboard vazio ou com opções de gestão
+    if not hasattr(request.user, 'perfil_barbeiro'):
+        return render(request, 'core/dashboard_barbeiro.html', {'is_admin_only': True})
+
+    barbeiro = request.user.perfil_barbeiro
     
     agendamentos_hoje = Agendamento.objects.filter(
         barbeiro=barbeiro, 
@@ -105,9 +116,27 @@ def cancelar_agendamento(request, agendamento_id):
     agendamento = get_object_or_404(Agendamento, id=agendamento_id)
     if request.user == agendamento.barbeiro.user:
         cliente_cel = agendamento.cliente.telefone
-        mensagem = f"Olá {agendamento.cliente.nome_completo}, infelizmente precisamos reagendar seu horário de {agendamento.data} às {agendamento.horario}. Podemos conversar?"
+        cliente_nome = agendamento.cliente.nome_completo if agendamento.cliente.nome_completo else agendamento.cliente.username
+        mensagem = f"Olá {cliente_nome}, infelizmente precisamos reagendar seu horário de {agendamento.data} às {agendamento.horario}. Podemos conversar?"
         link_cancelamento = f"https://wa.me/55{cliente_cel}?text={mensagem.replace(' ', '%20')}"
         agendamento.delete()
         return redirect(link_cancelamento)
     
     return redirect('home')
+
+@login_required
+def cadastrar_barbeiro(request):
+    if not request.user.is_superuser:
+        messages.error(request, "Acesso restrito.")
+        return redirect('home')
+    
+    if request.method == 'POST':
+        form = BarbeiroForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Barbeiro cadastrado com sucesso!")
+            return redirect('dashboard_barbeiro')
+    else:
+        form = BarbeiroForm()
+    
+    return render(request, 'core/cadastrar_barbeiro.html', {'form': form})

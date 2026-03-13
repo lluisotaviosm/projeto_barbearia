@@ -47,7 +47,7 @@
         </a>
         <div class="flex items-center gap-6">
             {% if user.is_authenticated %}
-                <span class="text-sm text-gray-400">Olá, {{ user.nome_completo|truncatechars:15 }}</span>
+                <span class="text-sm text-gray-400">Olá, {% firstof user.nome_completo user.username %}</span>
                 {% if user.perfil_barbeiro %}
                     <a href="{% url 'dashboard_barbeiro' %}" class="text-sm hover:text-[#d4af37]">Painel</a>
                 {% else %}
