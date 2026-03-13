@@ -94,9 +94,11 @@ def selecionar_horario(request, barbeiro_id, servico_id):
             # Notificação WhatsApp Automática (CallMeBot)
             if barbeiro.whatsapp_bot_key:
                 try:
+                    import re
+                    import requests
                     bot_key = barbeiro.whatsapp_bot_key
-                    # Garantir que o telefone tenha código do país (Brasil 55 por padrão se não tiver)
-                    fone = barbeiro.user.telefone
+                    # Limpar o telefone (deixar só números)
+                    fone = re.sub(r'\D', '', barbeiro.user.telefone)
                     if fone and not fone.startswith('55'):
                         fone = f'55{fone}'
                     
