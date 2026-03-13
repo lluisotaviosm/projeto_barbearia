@@ -165,17 +165,19 @@ def cadastrar_barbeiro(request):
     
     return render(request, 'core/cadastrar_barbeiro.html', {'form': form})
 
-    return render(request, 'core/cadastrar_barbeiro.html', {'form': form})
-
 @login_required
 def demitir_barbeiro(request, barbeiro_id):
     if not request.user.is_superuser:
         messages.error(request, "Acesso restrito.")
         return redirect('home')
     
-    barbeiro = get_object_or_404(Barbeiro, id=barbeiro_id)
-    user = barbeiro.user
-    barbeiro.delete()
-    user.delete()
-    messages.success(request, "Barbeiro removido com sucesso!")
+    try:
+        barbeiro = Barbeiro.objects.get(id=barbeiro_id)
+        user = barbeiro.user
+        # Ao deletar o usuário, o Barbeiro é deletado por CASCADE (definido no modelo)
+        user.delete() 
+        messages.success(request, "Barbeiro removido com sucesso!")
+    except Barbeiro.DoesNotExist:
+        messages.warning(request, "Este barbeiro já foi removido.")
+        
     return redirect('dashboard_barbeiro')
