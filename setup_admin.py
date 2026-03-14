@@ -27,7 +27,7 @@ def setup_admins():
                 username=username,
                 password=password,
                 nome_completo='Luis Otavio (Dono/Barbeiro)',
-                telefone='55281578065' # Telefone do print
+                telefone='55281578065' 
             )
         else:
             print(f"ATUALIZANDO ADMIN: {email}...")
@@ -38,7 +38,7 @@ def setup_admins():
             user.set_password(password)
             user.save()
             
-        # Garantir Perfil de Barbeiro com a Chave de API correta para o perfil oficial
+        # Garantir Perfil de Barbeiro com a Chave de API correta
         Barbeiro.objects.update_or_create(
             user=user, 
             defaults={
@@ -50,4 +50,3 @@ def setup_admins():
 
 if __name__ == '__main__':
     setup_admins()
- Riverside, CA
