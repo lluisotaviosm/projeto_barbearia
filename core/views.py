@@ -48,11 +48,11 @@ def dashboard_barbeiro(request):
         barbeiro = request.user.perfil_barbeiro
         context['barbeiro'] = barbeiro
         
-        # Filtro de hoje em diante para o barbeiro logado
-        qs_futuro = Agendamento.objects.filter(barbeiro=barbeiro, data__gte=today)
+        # Filtro: Mostrar todos os agendamentos PENDENTES
+        qs_pendente = Agendamento.objects.filter(barbeiro=barbeiro, confirmado=False)
         
         if not request.user.is_superuser: # Se for apenas barbeiro, vê apenas o dele
-            context['agendamentos_hoje'] = qs_futuro.order_by('data', 'horario')
+            context['agendamentos_hoje'] = qs_pendente.order_by('data', 'horario')
         
         # Saldo do Barbeiro (Total confirmado dele)
         saldo_barbeiro = Agendamento.objects.filter(barbeiro=barbeiro, confirmado=True).aggregate(Sum('servico__preco'))['servico__preco__sum'] or 0
