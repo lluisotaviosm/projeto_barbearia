@@ -89,6 +89,9 @@
                     <div>
                         <div class="flex items-center gap-2 mb-1">
                             <h4 class="text-xl font-bold">{% firstof agendamento.cliente.nome_completo agendamento.cliente.username %}</h4>
+                            <span class="text-[10px] bg-white/5 text-gray-400 px-2 py-0.5 rounded-full border border-white/10">
+                                {{ agendamento.data|date:"d/m" }}
+                            </span>
                             {% if user.is_superuser %}
                             <span class="text-[10px] bg-[#d4af37]/10 text-[#d4af37] px-2 py-0.5 rounded-full border border-[#d4af37]/20 uppercase">
                                 {{ agendamento.barbeiro }}

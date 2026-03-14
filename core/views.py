@@ -28,15 +28,18 @@ def dashboard_barbeiro(request):
     context = {}
     today = timezone.localdate()
     
-    # Se for superuser, ele vê tudo consolidado
+    # Se for superuser, ele vê tudo consolidado de hoje em diante
     if request.user.is_superuser:
         context['is_admin_only'] = not hasattr(request.user, 'perfil_barbeiro')
         context['barbeiros_lista'] = Barbeiro.objects.all()
+        # Filtro: de hoje para frente
         context['agendamentos_hoje'] = Agendamento.objects.filter(
-            data=today
-        ).order_by('barbeiro', 'horario')
+            data__gte=today
+        ).order_by('data', 'horario')
         
-        context['total_ganhos_geral'] = Agendamento.objects.filter(confirmado=True).aggregate(Sum('servico__preco'))['servico__preco__sum'] or 0
+        # Ganhos Totais (Soma de todos os servicos confirmados)
+        total_geral = Agendamento.objects.filter(confirmado=True).aggregate(Sum('servico__preco'))['servico__preco__sum'] or 0
+        context['total_ganhos_geral'] = total_geral
         context['total_clientes_geral'] = Agendamento.objects.values('cliente').distinct().count() or 0
         context['total_atendimentos_geral'] = Agendamento.objects.count()
 
@@ -45,13 +48,15 @@ def dashboard_barbeiro(request):
         barbeiro = request.user.perfil_barbeiro
         context['barbeiro'] = barbeiro
         
-        # Filtro de hoje para o barbeiro logado
-        qs_hoje = Agendamento.objects.filter(barbeiro=barbeiro, data=today)
+        # Filtro de hoje em diante para o barbeiro logado
+        qs_futuro = Agendamento.objects.filter(barbeiro=barbeiro, data__gte=today)
         
         if not request.user.is_superuser: # Se for apenas barbeiro, vê apenas o dele
-            context['agendamentos_hoje'] = qs_hoje.order_by('horario')
+            context['agendamentos_hoje'] = qs_futuro.order_by('data', 'horario')
         
-        context['total_ganhos'] = Agendamento.objects.filter(barbeiro=barbeiro, confirmado=True).aggregate(Sum('servico__preco'))['servico__preco__sum'] or 0
+        # Saldo do Barbeiro (Total confirmado dele)
+        saldo_barbeiro = Agendamento.objects.filter(barbeiro=barbeiro, confirmado=True).aggregate(Sum('servico__preco'))['servico__preco__sum'] or 0
+        context['total_ganhos'] = saldo_barbeiro
         context['total_clientes'] = Agendamento.objects.filter(barbeiro=barbeiro).values('cliente').distinct().count() or 0
         context['total_atendimentos'] = Agendamento.objects.filter(barbeiro=barbeiro).count()
     
