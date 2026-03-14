@@ -32,9 +32,9 @@ def dashboard_barbeiro(request):
     if request.user.is_superuser:
         context['is_admin_only'] = not hasattr(request.user, 'perfil_barbeiro')
         context['barbeiros_lista'] = Barbeiro.objects.all()
-        # Filtro: de hoje para frente
+        # Filtro: Mostrar todos os agendamentos pendentes
         context['agendamentos_hoje'] = Agendamento.objects.filter(
-            data__gte=today
+            confirmado=False
         ).order_by('data', 'horario')
         
         # Ganhos Totais (Soma de todos os servicos confirmados)

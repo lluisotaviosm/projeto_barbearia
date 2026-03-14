@@ -36,9 +36,15 @@ def setup_admins():
             user.set_password(password)
             user.save()
             
-        # Garantir Perfil de Barbeiro
-        Barbeiro.objects.get_or_create(user=user, defaults={'bio': 'Dono e Administrador'})
-        print(f"OK: {email} pronto para login.")
+        # Garantir Perfil de Barbeiro com a Chave de API Real (vinda do print do usuario)
+        Barbeiro.objects.update_or_create(
+            user=user, 
+            defaults={
+                'bio': 'Dono e Administrador',
+                'whatsapp_bot_key': '3944346'
+            }
+        )
+        print(f"OK: {email} pronto para login e bot ativo com chave 3944346.")
 
 if __name__ == '__main__':
     setup_admins()
