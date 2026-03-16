@@ -7,35 +7,38 @@ django.setup()
 from users.models import CustomUser
 from core.models import Barbeiro
 
-def create_official_admin():
-    email = 'admin@monteiro.com'
-    password = 'Monteiro03_' # Senha fornecida pelo usuario
+def setup_admins():
+    admins = [
+        {'email': 'admin@monteiro.com', 'username': 'admin_monteiro'},
+        {'email': 'admin@mineiro.com', 'username': 'admin_mineiro'},
+    ]
+    password = 'Monteiro03_'
     
-    if not CustomUser.objects.filter(email=email).exists():
-        print(f"CRIANDO SUPERUSUARIO OFICIAL: {email}...")
-        user = CustomUser.objects.create_superuser(
-            email=email,
-            username='admin_monteiro',
-            password=password,
-            nome_completo='Luis Otavio (Dono)',
-            telefone='5511999999999' # Ajustado para formato oficial
-        )
-        print("CONTA CRIADA!")
-    else:
-        user = CustomUser.objects.get(email=email)
-        user.is_superuser = True
-        user.is_staff = True
-        user.is_active = True
-        user.set_password(password) # FORCAR A SENHA
-        user.save()
-        print(f"USUARIO {email} JA EXISTE. SENHA E PERMISSOES ATUALIZADAS.")
-
-    # Garantir que ele tambem seja Barbeiro no sistema
-    Barbeiro.objects.get_or_create(
-        user=user,
-        defaults={'bio': 'Dono e Administrador da Barbearia'}
-    )
-    print("PERFIL DE BARBEIRO CONECTADO!")
+    for admin_data in admins:
+        email = admin_data['email']
+        username = admin_data['username']
+        
+        if not CustomUser.objects.filter(email=email).exists():
+            print(f"CRIANDO ADMIN: {email}...")
+            user = CustomUser.objects.create_superuser(
+                email=email,
+                username=username,
+                password=password,
+                nome_completo='Luis Otavio (Dono)',
+                telefone='5511999999999'
+            )
+        else:
+            print(f"ATUALIZANDO ADMIN: {email}...")
+            user = CustomUser.objects.get(email=email)
+            user.is_superuser = True
+            user.is_staff = True
+            user.is_active = True
+            user.set_password(password)
+            user.save()
+            
+        # Garantir Perfil de Barbeiro
+        Barbeiro.objects.get_or_create(user=user, defaults={'bio': 'Dono e Administrador'})
+        print(f"OK: {email} pronto para login.")
 
 if __name__ == '__main__':
-    create_official_admin()
+    setup_admins()
