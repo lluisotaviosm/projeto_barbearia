@@ -119,15 +119,25 @@ def selecionar_horario(request, barbeiro_id, servico_id):
 
 @login_required
 def confirmar_agendamento(request, agendamento_id):
+    import urllib.parse
+    import re
+    
     agendamento = get_object_or_404(Agendamento, id=agendamento_id, cliente=request.user)
     
     # Gerar link WhatsApp
-    mensagem = f"Olá, gostaria de confirmar meu agendamento na Barbearia do Mineiro.%0A" \
-               f"Serviço: {agendamento.servico.nome}%0A" \
-               f"Data: {agendamento.data}%0A" \
-               f"Horário: {agendamento.horario}"
+    mensagem = f"Olá, gostaria de confirmar meu agendamento na BARBEARIA DO MINEIRO JR.\n" \
+               f"Serviço: {agendamento.servico.nome}\n" \
+               f"Data: {agendamento.data.strftime('%d/%m/%Y')}\n" \
+               f"Horário: {agendamento.horario.strftime('%H:%M')}"
     
-    whatsapp_link = f"https://wa.me/55{agendamento.barbeiro.user.telefone}?text={mensagem}"
+    mensagem_encoded = urllib.parse.quote(mensagem)
+    
+    # Limpar o telefone do barbeiro
+    fone_barbeiro = re.sub(r'\D', '', agendamento.barbeiro.user.telefone)
+    if not fone_barbeiro.startswith('55'):
+        fone_barbeiro = f"55{fone_barbeiro}"
+        
+    whatsapp_link = f"https://wa.me/{fone_barbeiro}?text={mensagem_encoded}"
     
     return render(request, 'core/confirmar_agendamento.html', {
         'agendamento': agendamento,
@@ -136,16 +146,31 @@ def confirmar_agendamento(request, agendamento_id):
 
 @login_required
 def cancelar_agendamento(request, agendamento_id):
-    # Barbeiro cancelando
-    agendamento = get_object_or_404(Agendamento, id=agendamento_id)
-    if request.user == agendamento.barbeiro.user:
-        cliente_cel = agendamento.cliente.telefone
-        cliente_nome = agendamento.cliente.nome_completo if agendamento.cliente.nome_completo else agendamento.cliente.username
-        mensagem = f"Olá {cliente_nome}, infelizmente precisamos reagendar seu horário de {agendamento.data} às {agendamento.horario}. Podemos conversar?"
-        link_cancelamento = f"https://wa.me/55{cliente_cel}?text={mensagem.replace(' ', '%20')}"
-        agendamento.delete()
-        return redirect(link_cancelamento)
+    import urllib.parse
+    import re
     
+    agendamento = get_object_or_404(Agendamento, id=agendamento_id)
+    
+    # Permite se for o barbeiro do agendamento OU se for superuser
+    if request.user == agendamento.barbeiro.user or request.user.is_superuser:
+        # Limpar o telefone (deixar só números)
+        cliente_cel = re.sub(r'\D', '', agendamento.cliente.telefone)
+        
+        # Garantir o prefixo 55 se necessário
+        if not cliente_cel.startswith('55'):
+            cliente_cel = f"55{cliente_cel}"
+            
+        cliente_nome = agendamento.cliente.nome_completo if agendamento.cliente.nome_completo else agendamento.cliente.username
+        
+        mensagem = f"Olá {cliente_nome}, aqui é da BARBEARIA DO MINEIRO JR. Infelizmente precisamos reagendar seu horário de {agendamento.data.strftime('%d/%m/%Y')} às {agendamento.horario.strftime('%H:%M')}. Podemos conversar?"
+        
+        mensagem_encoded = urllib.parse.quote(mensagem)
+        link_whatsapp = f"https://wa.me/{cliente_cel}?text={mensagem_encoded}"
+        
+        agendamento.delete()
+        return redirect(link_whatsapp)
+    
+    messages.error(request, "Você não tem permissão para cancelar este agendamento.")
     return redirect('home')
 
 @login_required
