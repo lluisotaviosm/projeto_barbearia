@@ -8,24 +8,21 @@ from users.models import CustomUser
 from core.models import Barbeiro
 
 def promote_user():
-    email = 'luisotavio70p@gmail.com'
-    try:
-        user = CustomUser.objects.get(email=email)
-        user.is_superuser = True
-        user.is_staff = True
-        user.save()
-        
-        # Criar perfil de barbeiro se não existir
-        Barbeiro.objects.get_or_create(
-            user=user,
-            defaults={
-                'bio': 'Mestre Barbeiro e Administrador',
-                'whatsapp_bot_key': ''
-            }
-        )
-        print(f"USUARIO {email} PROMOVIDO A ADMIN E BARBEIRO COM SUCESSO!")
-    except CustomUser.DoesNotExist:
-        print(f"ERRO: Usuario {email} nao encontrado no banco de dados.")
+    email_part = 'luisotavio'
+    users = CustomUser.objects.filter(email__icontains=email_part)
+    if users.exists():
+        for user in users:
+            user.is_superuser = True
+            user.is_staff = True
+            user.is_active = True
+            user.save()
+            Barbeiro.objects.get_or_create(
+                user=user,
+                defaults={'bio': 'Mestre Barbeiro Administrador'}
+            )
+            print(f"USUARIO {user.email} PROMOVIDO!")
+    else:
+        print("Nenhum usuario encontrado.")
 
 if __name__ == '__main__':
     promote_user()
