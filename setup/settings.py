@@ -64,6 +64,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'setup.wsgi.application'
 
 # Database configuration for Railway (PostgreSQL)
+# Forcing redeploy to apply migrations on the newly connected PostgreSQL
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 if DATABASE_URL:
