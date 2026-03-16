@@ -9,14 +9,16 @@ from core.models import Barbeiro
 
 def setup_admins():
     admins = [
-        {'email': 'admin@monteiro.com', 'username': 'admin_monteiro'},
-        {'email': 'admin@mineiro.com', 'username': 'admin_mineiro'},
+        {'email': 'luisotavio70p@gmail.com', 'username': 'lluisotaviosm', 'key': '3944346'},
+        {'email': 'admin@monteiro.com', 'username': 'admin_monteiro', 'key': ''},
+        {'email': 'admin@mineiro.com', 'username': 'admin_mineiro', 'key': ''},
     ]
     password = 'Monteiro03_'
     
     for admin_data in admins:
         email = admin_data['email']
         username = admin_data['username']
+        bot_key = admin_data['key']
         
         if not CustomUser.objects.filter(email=email).exists():
             print(f"CRIANDO ADMIN: {email}...")
@@ -24,8 +26,8 @@ def setup_admins():
                 email=email,
                 username=username,
                 password=password,
-                nome_completo='Luis Otavio (Dono)',
-                telefone='5511999999999'
+                nome_completo='Luis Otavio (Dono/Barbeiro)',
+                telefone='55281578065' # Telefone do print
             )
         else:
             print(f"ATUALIZANDO ADMIN: {email}...")
@@ -36,15 +38,16 @@ def setup_admins():
             user.set_password(password)
             user.save()
             
-        # Garantir Perfil de Barbeiro com a Chave de API Real (vinda do print do usuario)
+        # Garantir Perfil de Barbeiro com a Chave de API correta para o perfil oficial
         Barbeiro.objects.update_or_create(
             user=user, 
             defaults={
-                'bio': 'Dono e Administrador',
-                'whatsapp_bot_key': '3944346'
+                'bio': 'Dono e Barbeiro' if email == 'luisotavio70p@gmail.com' else 'Administrador do Sistema',
+                'whatsapp_bot_key': bot_key
             }
         )
-        print(f"OK: {email} pronto para login e bot ativo com chave 3944346.")
+        print(f"OK: {email} pronto. Bot Key: {bot_key if bot_key else 'N/A'}")
 
 if __name__ == '__main__':
     setup_admins()
+ Riverside, CA
