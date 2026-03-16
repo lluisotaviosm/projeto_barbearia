@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-20">
+    <div class="dark-card p-8 md:p-12 rounded-3xl">
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-bold mb-4">Cadastrar Novo <span class="text-[#d4af37]">Barbeiro</span></h1>
+            <p class="text-gray-500">Crie uma conta de usuário e vincule ao perfil de profissional.</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for field in form %}
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm font-semibold text-gray-400">{{ field.label }}</label>
+                        {% if field.name == 'bio' %}
+                            <textarea name="{{ field.name }}" class="bg-white/5 border border-white/10 rounded-xl p-3 focus:outline-none focus:border-[#d4af37] text-white h-32"></textarea>
+                        {% elif field.name == 'foto' %}
+                            <input type="file" name="{{ field.name }}" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#d4af37]/10 file:text-[#d4af37] hover:file:bg-[#d4af37]/20">
+                        {% else %}
+                            <input type="{{ field.field.widget.input_type|default:'text' }}" name="{{ field.name }}" class="bg-white/5 border border-white/10 rounded-xl p-3 focus:outline-none focus:border-[#d4af37] text-white" value="{{ field.value|default:'' }}">
+                        {% endif %}
+                        {% if field.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ field.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="pt-6">
+                <button type="submit" class="w-full btn-gold py-4 rounded-xl text-lg shadow-lg shadow-[#d4af37]/10">
+                    Cadastrar Profissional
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

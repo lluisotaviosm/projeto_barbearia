@@ -3,6 +3,7 @@
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 py-12">
     <!-- Header/Metrics -->
+    {% if not is_admin_only %}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         <div class="dark-card p-8 rounded-3xl border-l-4 border-[#d4af37]">
             <p class="text-gray-500 text-sm uppercase tracking-wider mb-1">Saldo Total</p>
@@ -17,7 +18,23 @@
             <h3 class="text-3xl font-bold text-white">{{ total_atendimentos }}</h3>
         </div>
     </div>
+    {% endif %}
 
+    {% if user.is_superuser %}
+    <div class="mb-12">
+        <div class="dark-card p-8 rounded-3xl border-dashed border-2 border-[#d4af37]/30 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <h3 class="text-xl font-bold mb-2">Painel de Gestão Admin</h3>
+                <p class="text-gray-500 text-sm">Como administrador, você pode cadastrar novos profissionais e gerenciar a barbearia.</p>
+            </div>
+            <a href="{% url 'cadastrar_barbeiro' %}" class="btn-gold px-8 py-3 rounded-xl flex items-center gap-3">
+                <i class="fas fa-plus"></i> Cadastrar Barbeiro
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not is_admin_only %}
     <!-- Today's Schedule -->
     <div class="flex justify-between items-center mb-8">
         <h2 class="text-3xl font-bold">Agenda de <span class="text-[#d4af37]">Hoje</span></h2>
@@ -33,7 +50,7 @@
                     </div>
                     <div class="h-10 w-px bg-white/10 hidden md:block"></div>
                     <div>
-                        <h4 class="text-xl font-bold">{{ agendamento.cliente.nome_completo }}</h4>
+                        <h4 class="text-xl font-bold">{% firstof agendamento.cliente.nome_completo agendamento.cliente.username %}</h4>
                         <p class="text-gray-500">{{ agendamento.servico.nome }} • R$ {{ agendamento.servico.preco }}</p>
                         <p class="text-xs text-gray-600 mt-1">{{ agendamento.cliente.telefone }}</p>
                     </div>
@@ -50,5 +67,12 @@
             </div>
         {% endfor %}
     </div>
+    {% else %}
+    <div class="text-center py-20">
+        <i class="fas fa-user-shield text-6xl text-[#d4af37]/20 mb-6"></i>
+        <h2 class="text-2xl font-bold mb-2">Painel de Administrador</h2>
+        <p class="text-gray-500">Use os links acima para gerenciar os barbeiros da plataforma.</p>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}
