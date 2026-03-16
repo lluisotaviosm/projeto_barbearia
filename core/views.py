@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Barbeiro, Servico, Agendamento
+from .forms import BarbeiroForm
 from django.contrib import messages
 from django.db.models import Sum, Count
 from django.utils import timezone
