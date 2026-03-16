@@ -7,46 +7,50 @@ django.setup()
 from users.models import CustomUser
 from core.models import Barbeiro
 
-def setup_admins():
-    admins = [
-        {'email': 'luisotavio70p@gmail.com', 'username': 'lluisotaviosm', 'key': '3944346'},
-        {'email': 'admin@monteiro.com', 'username': 'admin_monteiro', 'key': ''},
-        {'email': 'admin@mineiro.com', 'username': 'admin_mineiro', 'key': ''},
-    ]
-    password = 'Monteiro03_'
-    
-    for admin_data in admins:
-        email = admin_data['email']
-        username = admin_data['username']
-        bot_key = admin_data['key']
-        
-        if not CustomUser.objects.filter(email=email).exists():
-            print(f"CRIANDO ADMIN: {email}...")
-            user = CustomUser.objects.create_superuser(
-                email=email,
-                username=username,
-                password=password,
-                nome_completo='Luis Otavio (Dono/Barbeiro)',
-                telefone='55281578065' 
-            )
-        else:
-            print(f"ATUALIZANDO ADMIN: {email}...")
-            user = CustomUser.objects.get(email=email)
-            user.is_superuser = True
-            user.is_staff = True
-            user.is_active = True
-            user.set_password(password)
-            user.save()
-            
-        # Garantir Perfil de Barbeiro com a Chave de API correta
-        Barbeiro.objects.update_or_create(
-            user=user, 
-            defaults={
-                'bio': 'Dono e Barbeiro' if email == 'luisotavio70p@gmail.com' else 'Administrador do Sistema',
-                'whatsapp_bot_key': bot_key
-            }
-        )
-        print(f"OK: {email} pronto. Bot Key: {bot_key if bot_key else 'N/A'}")
+def setup_final_clean():
+    # 1. admin@monteiro.com AS OWNER
+    admin_mon, _ = CustomUser.objects.update_or_create(
+        email='admin@monteiro.com',
+        defaults={
+            'username': 'admin_monteiro',
+            'is_superuser': True,
+            'is_staff': True,
+            'is_active': True,
+            'nome_completo': 'Luis Otavio (Dono)'
+        }
+    )
+    admin_mon.set_password('Monteiro03_')
+    admin_mon.save()
+
+    # 2. luisotavio70p@gmail.com AS OFFICIAL BARBER (is_staff=True)
+    barber_user, _ = CustomUser.objects.update_or_create(
+        email='luisotavio70p@gmail.com',
+        defaults={
+            'username': 'lluisotaviosm',
+            'is_superuser': False,
+            'is_staff': True,
+            'is_active': True,
+            'telefone': '55281578065',
+            'nome_completo': 'Luis Otavio (Barbeiro)'
+        }
+    )
+    barber_user.set_password('Monteiro03_')
+    barber_user.save()
+
+    # 3. LINK BOT KEY (3944346)
+    Barbeiro.objects.update_or_create(
+        user=barber_user,
+        defaults={
+            'bio': 'Barbeiro Oficial',
+            'whatsapp_bot_key': '3944346'
+        }
+    )
+
+    # 4. REMOVE OTHERS
+    CustomUser.objects.filter(email='admin@mineiro.com').delete()
+    Barbeiro.objects.filter(user=admin_mon).update(whatsapp_bot_key='')
+
+    print(f"DONE: {admin_mon.email} is Owner. {barber_user.email} is Barber with Bot.")
 
 if __name__ == '__main__':
-    setup_admins()
+    setup_final_clean()
