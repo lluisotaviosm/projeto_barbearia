@@ -94,8 +94,27 @@
                         <p class="text-xs text-gray-600 mt-1">{{ agendamento.cliente.telefone }}</p>
                     </div>
                 </div>
-                <div class="flex gap-4">
-                    <a href="{% url 'cancelar_agendamento' agendamento.id %}" class="bg-red-900/20 text-red-500 px-6 py-2 rounded-xl text-sm font-semibold hover:bg-red-900/40 transition-all">
+                <div class="flex flex-wrap gap-4 items-center">
+                    {% if not agendamento.confirmado %}
+                    <form action="{% url 'finalizar_atendimento' agendamento.id %}" method="post" class="flex items-center gap-2 bg-white/5 p-2 rounded-xl border border-white/10">
+                        {% csrf_token %}
+                        <select name="forma_pagamento" required class="bg-transparent text-xs text-gray-400 focus:outline-none cursor-pointer">
+                            <option value="" disabled selected>Pagamento</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="Pix">Pix</option>
+                            <option value="Cartão">Cartão</option>
+                        </select>
+                        <button type="submit" class="bg-[#d4af37] text-black px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-[#b8860b] transition-all whitespace-nowrap">
+                            Já Atendido
+                        </button>
+                    </form>
+                    {% else %}
+                    <span class="text-xs font-bold text-green-500 bg-green-500/10 px-3 py-1.5 rounded-lg border border-green-500/20">
+                        <i class="fas fa-check mr-1"></i> {{ agendamento.forma_pagamento }}
+                    </span>
+                    {% endif %}
+
+                    <a href="{% url 'cancelar_agendamento' agendamento.id %}" class="bg-red-900/20 text-red-500 px-4 py-1.5 rounded-xl text-xs font-semibold hover:bg-red-900/40 transition-all">
                         {% if user.is_superuser %}Remover{% else %}Cancelar{% endif %}
                     </a>
                 </div>

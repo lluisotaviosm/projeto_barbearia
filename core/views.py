@@ -78,6 +78,22 @@ def selecionar_horario(request, barbeiro_id, servico_id):
         data = request.POST.get('data')
         horario = request.POST.get('horario')
         
+        # Verificar se a hora já passou (se for hoje)
+        try:
+            from django.utils import timezone
+            import datetime
+            dt_agendamento = datetime.datetime.strptime(f"{data} {horario}", "%Y-%m-%d %H:%M")
+            # Converte para datetime "aware" se necessário, ou compara com naive se timezone for naive
+            # O Django geralmente usa aware se USE_TZ=True.
+            dt_agendamento = timezone.make_aware(dt_agendamento)
+            if dt_agendamento < timezone.now():
+                messages.error(request, "Você não pode agendar um horário que já passou.")
+                return render(request, 'core/selecionar_horario.html', {
+                    'barbeiro': barbeiro, 'servico': servico, 'horarios': ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"]
+                })
+        except Exception as e:
+            print(f"Erro na validação de data: {e}")
+
         # Verificar duplicidade
         if Agendamento.objects.filter(barbeiro=barbeiro, data=data, horario=horario).exists():
             messages.error(request, "Este horário já está ocupado.")
@@ -191,6 +207,22 @@ def cadastrar_barbeiro(request):
         form = BarbeiroForm()
     
     return render(request, 'core/cadastrar_barbeiro.html', {'form': form})
+
+@login_required
+def finalizar_atendimento(request, agendamento_id):
+    agendamento = get_object_or_404(Agendamento, id=agendamento_id)
+    
+    # Apenas o barbeiro dono ou admin podem finalizar
+    if request.user == agendamento.barbeiro.user or request.user.is_superuser:
+        if request.method == 'POST':
+            forma_pagamento = request.POST.get('forma_pagamento')
+            agendamento.forma_pagamento = forma_pagamento
+            agendamento.confirmado = True
+            agendamento.status = 'CONCLUIDO'
+            agendamento.save()
+            messages.success(request, f"Atendimento de {agendamento.cliente.username} finalizado!")
+            
+    return redirect('dashboard_barbeiro')
 
 @login_required
 def demitir_barbeiro(request, barbeiro_id):
