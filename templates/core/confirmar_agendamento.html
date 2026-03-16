@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-20">
+    <div class="dark-card p-10 rounded-[40px] text-center">
+        <div class="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-8">
+            <i class="fa-solid fa-check text-5xl text-green-500"></i>
+        </div>
+        
+        <h2 class="text-4xl font-bold mb-4 text-white">Agendado!</h2>
+        <p class="text-gray-400 mb-10 text-lg">
+            Seu horário para <strong>{{ agendamento.servico.nome }}</strong> foi solicitado com sucesso.
+        </p>
+
+        <div class="bg-black/40 rounded-3xl p-6 mb-10 text-left space-y-4">
+            <div class="flex justify-between">
+                <span class="text-gray-500">Profissional</span>
+                <span class="font-bold text-white">{{ agendamento.barbeiro.user.nome_completo }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-500">Data e Hora</span>
+                <span class="font-bold text-white">{{ agendamento.data }} às {{ agendamento.horario }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-500">Valor</span>
+                <span class="font-bold text-[#d4af37]">R$ {{ agendamento.servico.preco }}</span>
+            </div>
+        </div>
+
+        <a href="{{ whatsapp_link }}" target="_blank" class="block w-full bg-[#25D366] text-white py-5 rounded-2xl font-bold text-xl hover:bg-[#128C7E] transition-all flex items-center justify-center gap-3 shadow-lg shadow-[#25D366]/20">
+            <i class="fa-brands fa-whatsapp text-2xl"></i>
+            Confirmar no WhatsApp
+        </a>
+        
+        <a href="{% url 'dashboard_cliente' %}" class="block mt-6 text-gray-500 hover:text-white transition-colors">
+            Voltar para Meus Agendamentos
+        </a>
+    </div>
+</div>
+{% endblock %}

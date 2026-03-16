@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-16">
+    <div class="text-center mb-12">
+        <h2 class="text-4xl font-bold mb-4 text-[#d4af37]">Escolha o Barbeiro</h2>
+        <p class="text-gray-500">Selecione o profissional de sua preferência.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {% for barbeiro in barbeiros %}
+            <a href="{% url 'selecionar_servico' barbeiro.id %}" class="group">
+                <div class="dark-card p-8 rounded-3xl flex items-center gap-6">
+                    <div class="w-20 h-20 rounded-2xl bg-[#d4af37]/10 flex items-center justify-center overflow-hidden">
+                        {% if barbeiro.foto %}
+                            <img src="{{ barbeiro.foto.url }}" alt="{{ barbeiro.user.nome_completo }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <i class="fa-solid fa-scissors text-3xl text-[#d4af37]"></i>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold group-hover:text-[#d4af37] transition-colors">{{ barbeiro.user.nome_completo }}</h3>
+                        <p class="text-gray-500 text-sm mt-1">{{ barbeiro.bio|truncatechars:60 }}</p>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

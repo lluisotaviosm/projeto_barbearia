@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Barbearia do Mineiro{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0a0a0a;
+            color: #e5e5e5;
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #d4af37 0%, #f9e29c 50%, #b8860b 100%);
+        }
+        .dark-card {
+            background: rgba(23, 23, 23, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .dark-card:hover {
+            border-color: #d4af37;
+            transform: translateY(-5px);
+        }
+        .btn-gold {
+            background: #d4af37;
+            color: #000;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-gold:hover {
+            background: #b8860b;
+            transform: scale(1.02);
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="border-b border-white/10 py-4 px-6 flex justify-between items-center bg-black/50 sticky top-0 z-50">
+        <a href="{% url 'home' %}" class="text-2xl font-bold tracking-tighter text-white">
+            MINEIRO<span class="text-[#d4af37]">BARBER</span>
+        </a>
+        <div class="flex items-center gap-6">
+            {% if user.is_authenticated %}
+                <span class="text-sm text-gray-400">Olá, {{ user.nome_completo|truncatechars:15 }}</span>
+                {% if user.perfil_barbeiro %}
+                    <a href="{% url 'dashboard_barbeiro' %}" class="text-sm hover:text-[#d4af37]">Painel</a>
+                {% else %}
+                    <a href="{% url 'dashboard_cliente' %}" class="text-sm hover:text-[#d4af37]">Minha Agenda</a>
+                {% endif %}
+                <form action="{% url 'logout' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="text-sm text-red-500 hover:text-red-400">Sair</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="text-sm hover:text-[#d4af37]">Entrar</a>
+                <a href="{% url 'cadastro' %}" class="px-4 py-2 bg-[#d4af37] text-black rounded-lg text-sm font-semibold hover:bg-[#b8860b]">Começar</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="flex-grow">
+        {% if messages %}
+            <div class="max-w-4xl mx-auto mt-4 px-4">
+                {% for message in messages %}
+                    <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-900/50 text-red-200{% else %}bg-green-900/50 text-green-200{% endif %} border border-white/10 mb-2">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="py-8 border-t border-white/10 text-center text-gray-500 text-sm">
+        <p>&copy; 2024 Barbearia do Mineiro. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>

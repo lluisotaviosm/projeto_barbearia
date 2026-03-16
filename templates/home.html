@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-20 text-center">
+    <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+        Barbearia do <span class="text-[#d4af37]">Mineiro</span>
+    </h1>
+    <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+        Estilo, precisão e tradição. Escolha como deseja acessar nosso sistema para uma experiência de agendamento premium.
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <!-- Card Cliente -->
+        <a href="{% url 'dashboard_cliente' %}" class="group">
+            <div class="dark-card p-10 rounded-3xl h-full flex flex-col items-center justify-center">
+                <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6 group-hover:bg-[#d4af37]/20 transition-all">
+                    <i class="fa-solid fa-user text-4xl text-[#d4af37]"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Sou Cliente</h3>
+                <p class="text-gray-500">Agende seu horário com os melhores profissionais.</p>
+            </div>
+        </a>
+
+        <!-- Card Barbeiro -->
+        <a href="{% url 'dashboard_barbeiro' %}" class="group">
+            <div class="dark-card p-10 rounded-3xl h-full flex flex-col items-center justify-center border-dashed border-white/5">
+                <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6 group-hover:bg-[#d4af37]/20 transition-all">
+                    <i class="fa-solid fa-scissors text-4xl text-[#d4af37]"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Sou Barbeiro</h3>
+                <p class="text-gray-500">Gestão profissional de sua agenda e ganhos.</p>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}
