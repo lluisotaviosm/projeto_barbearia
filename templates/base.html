@@ -43,7 +43,7 @@
     <!-- Navbar -->
     <nav class="border-b border-white/10 py-4 px-6 flex justify-between items-center bg-black/50 sticky top-0 z-50">
         <a href="{% url 'home' %}" class="text-2xl font-bold tracking-tighter text-white">
-            MINEIRO<span class="text-[#d4af37]">BARBER</span>
+            BARBEARIA DO <span class="text-[#d4af37]">MINEIRO JR</span>
         </a>
         <div class="flex items-center gap-6">
             {% if user.is_authenticated %}
@@ -59,8 +59,7 @@
                     <button type="submit" class="text-sm text-red-500 hover:text-red-400">Sair</button>
                 </form>
             {% else %}
-                <a href="{% url 'login' %}" class="text-sm hover:text-[#d4af37]">Entrar</a>
-                <a href="{% url 'cadastro' %}" class="px-4 py-2 bg-[#d4af37] text-black rounded-lg text-sm font-semibold hover:bg-[#b8860b]">Começar</a>
+                {# Removendo Entrar e Começar conforme solicitado #}
             {% endif %}
         </div>
     </nav>
@@ -79,7 +78,8 @@
     </main>
 
     <footer class="py-8 border-t border-white/10 text-center text-gray-500 text-sm">
-        <p>&copy; 2024 Barbearia do Mineiro. Todos os direitos reservados.</p>
+        <p>&copy; 2024 BARBEARIA DO MINEIRO JR. Todos os direitos reservados.</p>
     </footer>
+ Riverside, CA
 </body>
 </html>
