@@ -90,7 +90,23 @@ def selecionar_horario(request, barbeiro_id, servico_id):
                 horario=horario
             )
             messages.success(request, "Agendamento realizado com sucesso!")
-            # Simulação de Notificação WhatsApp
+            
+            # Notificação WhatsApp Automática (CallMeBot)
+            if barbeiro.whatsapp_bot_key:
+                try:
+                    bot_key = barbeiro.whatsapp_bot_key
+                    # Garantir que o telefone tenha código do país (Brasil 55 por padrão se não tiver)
+                    fone = barbeiro.user.telefone
+                    if fone and not fone.startswith('55'):
+                        fone = f'55{fone}'
+                    
+                    cliente_nome = request.user.nome_completo or request.user.username
+                    msg_bot = f"Novo Agendamento!%0ACliente: {cliente_nome}%0AServiço: {servico.nome}%0AData: {data}%0AHorário: {horario}"
+                    url_bot = f"https://api.callmebot.com/whatsapp.php?phone={fone}&text={msg_bot}&apikey={bot_key}"
+                    requests.get(url_bot, timeout=10)
+                except Exception as e:
+                    print(f"Erro ao enviar notificação bot: {e}")
+
             return redirect('confirmar_agendamento', agendamento_id=agendamento.id)
             
     # Horários fixos para exemplo
