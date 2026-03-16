@@ -65,13 +65,13 @@ WSGI_APPLICATION = 'setup.wsgi.application'
 
 # Database configuration for Railway (PostgreSQL)
 DATABASE_URL = os.getenv('DATABASE_URL')
+
 if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.config(
             default=DATABASE_URL,
             conn_max_age=600,
-            conn_health_checks=True,
-            ssl_require=True if not DEBUG else False
+            ssl_require=True if os.getenv('RAILWAY_ENVIRONMENT') else False
         )
     }
 else:
