@@ -55,6 +55,9 @@ def dashboard_barbeiro(request):
         context['total_clientes'] = Agendamento.objects.filter(barbeiro=barbeiro).values('cliente').distinct().count() or 0
         context['total_atendimentos'] = Agendamento.objects.filter(barbeiro=barbeiro).count()
     
+    from django.db import connection
+    context['db_engine'] = 'PostgreSQL' if 'postgresql' in connection.vendor else 'SQLite'
+    
     context['today'] = today
     return render(request, 'core/dashboard_barbeiro.html', context)
 
