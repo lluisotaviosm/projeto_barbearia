@@ -48,11 +48,12 @@
         <div class="flex items-center gap-6">
             {% if user.is_authenticated %}
                 <span class="text-sm text-gray-400">Olá, {% firstof user.nome_completo user.username %}</span>
-                {% if user.perfil_barbeiro %}
+                {% if user.perfil_barbeiro or user.is_staff %}
                     <a href="{% url 'dashboard_barbeiro' %}" class="text-sm hover:text-[#d4af37]">Painel</a>
                 {% else %}
                     <a href="{% url 'dashboard_cliente' %}" class="text-sm hover:text-[#d4af37]">Minha Agenda</a>
                 {% endif %}
+
                 <form action="{% url 'logout' %}" method="post" class="inline">
                     {% csrf_token %}
                     <button type="submit" class="text-sm text-red-500 hover:text-red-400">Sair</button>
