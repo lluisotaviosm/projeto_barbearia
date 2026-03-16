@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Barbeiro, Servico, Agendamento
 from django.contrib import messages
 from django.db.models import Sum, Count
+from django.utils import timezone
 import datetime
 
 def home(request):
