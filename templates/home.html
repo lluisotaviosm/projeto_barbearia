@@ -3,7 +3,7 @@
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 py-20 text-center">
     <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
-        Barbearia do <span class="text-[#d4af37]">Mineiro</span>
+        {{ BARBERSHOP_NAME|default:"Barbearia do Mineiro" }}
     </h1>
     <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
         Estilo, precisão e tradição. Escolha como deseja acessar nosso sistema para uma experiência de agendamento premium.

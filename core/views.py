@@ -5,6 +5,7 @@ from .forms import BarbeiroForm
 from django.contrib import messages
 from django.db.models import Sum, Count
 from django.utils import timezone
+from django.conf import settings
 import datetime
 
 def home(request):
@@ -151,7 +152,8 @@ def confirmar_agendamento(request, agendamento_id):
     agendamento = get_object_or_404(Agendamento, id=agendamento_id, cliente=request.user)
     
     # Gerar link WhatsApp
-    mensagem = f"Olá, gostaria de confirmar meu agendamento na BARBEARIA DO MINEIRO JR.\n" \
+    barbershop_name = getattr(settings, 'BARBERSHOP_NAME', 'Barbearia do Mineiro').upper()
+    mensagem = f"Olá, gostaria de confirmar meu agendamento na {barbershop_name}.\n" \
                f"Serviço: {agendamento.servico.nome}\n" \
                f"Data: {agendamento.data.strftime('%d/%m/%Y')}\n" \
                f"Horário: {agendamento.horario.strftime('%H:%M')}"
@@ -188,7 +190,8 @@ def cancelar_agendamento(request, agendamento_id):
             
         cliente_nome = agendamento.cliente.nome_completo or agendamento.cliente.username
         
-        mensagem = f"Olá {cliente_nome}, aqui é da BARBEARIA DO MINEIRO JR. Infelizmente precisamos reagendar seu horário de {agendamento.data.strftime('%d/%m/%Y')} às {agendamento.horario.strftime('%H:%M')}. Podemos conversar?"
+        barbershop_name = getattr(settings, 'BARBERSHOP_NAME', 'Barbearia do Mineiro').upper()
+        mensagem = f"Olá {cliente_nome}, aqui é da {barbershop_name}. Infelizmente precisamos reagendar seu horário de {agendamento.data.strftime('%d/%m/%Y')} às {agendamento.horario.strftime('%H:%M')}. Podemos conversar?"
         
         mensagem_encoded = urllib.parse.quote(mensagem)
         link_whatsapp = f"https://api.whatsapp.com/send?phone={cliente_cel}&text={mensagem_encoded}"
