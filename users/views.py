@@ -36,11 +36,26 @@ def password_reset_phone(request):
                 request.session['reset_otp'] = otp
                 request.session['reset_user_id'] = user.id
                 
-                # Simular envio para WhatsApp:
+                # Simular envio para WhatsApp e Enviar real pela CallMeBot se tiver master key:
                 print(f"=====================================")
-                print(f"[SIMULAÇÃO WHATSAPP API] -> Enviando para {telefone_limpo}")
+                print(f"[API WHATSAPP] -> Enviando para {telefone_limpo}")
                 print(f"Olá {user.username}, seu código de recuperação da Barbearia é: {otp}")
                 print(f"=====================================")
+                
+                try:
+                    import requests
+                    from core.models import Barbeiro
+                    barbeiro_bot = Barbeiro.objects.exclude(whatsapp_bot_key__isnull=True).exclude(whatsapp_bot_key='').first()
+                    if barbeiro_bot:
+                        bot_key = barbeiro_bot.whatsapp_bot_key
+                        fone = telefone_limpo
+                        if not fone.startswith('55'):
+                            fone = f'55{fone}'
+                        msg_bot = f"Olá {user.username}, seu código de recuperação da Barbearia é: *{otp}*"
+                        url_bot = f"https://api.callmebot.com/whatsapp.php?phone={fone}&text={msg_bot}&apikey={bot_key}"
+                        requests.get(url_bot, timeout=5)
+                except Exception as e:
+                    print(f"Erro no envio real WPP API: {e}")
                 
                 messages.success(request, f"Código de verificação enviado para o seu WhatsApp cadastrado com final {telefone_limpo[-4:]}")
                 return redirect('password_reset_otp')

@@ -16,14 +16,16 @@
                     <div class="h-48 w-full bg-black relative">
                         {% if servico.imagem %}
                             <img src="{{ servico.imagem.url }}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="{{ servico.nome }}">
+                        {% elif 'corte' in servico.nome|lower and 'barba' in servico.nome|lower %}
+                            <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&q=80&w=600&h=400" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Corte e Barba">
                         {% elif 'corte' in servico.nome|lower or 'social' in servico.nome|lower %}
-                            <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=80&w=600&h=400" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Corte">
+                            <img src="https://images.unsplash.com/photo-1593702288056-cc15618fce1b?auto=format&fit=crop&q=80&w=600&h=400" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Corte">
                         {% elif 'barba' in servico.nome|lower %}
-                            <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=600&h=400" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Barba">
+                            <img src="https://www.instagram.com/p/DAM86aAO6Cr/" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Barba">
                         {% elif 'sobra' in servico.nome|lower %}
-                            <img src="https://images.unsplash.com/photo-1590159763121-7c9daea25efd?auto=format&fit=crop&q=80&w=600&h=400" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Sobrancelha">
+                            <img src="https://images.unsplash.com/photo-1510227272981-87123aa12dcc?auto=format&fit=crop&q=80&w=600&h=400" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Sobrancelha">
                         {% elif 'topad' in servico.nome|lower or 'combo' in servico.nome|lower %}
-                            <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=600&h=400" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Combo Topadão">
+                            <img src="https://images.unsplash.com/photo-1593702288056-cc15618fce1b?auto=format&fit=crop&q=80&w=600&h=400" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Combo Topadão">
                         {% else %}
                             <div class="w-full h-full flex items-center justify-center bg-gray-900 group-hover:bg-gray-800 transition-colors">
                                 <i class="fa-solid fa-scissors text-4xl text-[#d4af37] opacity-50"></i>
