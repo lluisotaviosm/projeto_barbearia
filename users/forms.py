@@ -17,6 +17,11 @@ class CustomUserCreationForm(forms.ModelForm):
             'telefone': 'WhatsApp',
         }
 
+    def clean_telefone(self):
+        telefone = self.cleaned_data.get('telefone', '')
+        import re
+        return re.sub(r'\D', '', telefone)
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password'])
@@ -30,3 +35,8 @@ class CustomUserChangeForm(UserChangeForm):
     class Meta(UserChangeForm.Meta):
         model = CustomUser
         fields = ('email', 'username', 'telefone')
+
+    def clean_telefone(self):
+        telefone = self.cleaned_data.get('telefone', '')
+        import re
+        return re.sub(r'\D', '', telefone)

@@ -10,13 +10,40 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {% for servico in servicos %}
             <a href="{% url 'selecionar_horario' barbeiro.id servico.id %}" class="group">
-                <div class="dark-card p-6 rounded-3xl flex justify-between items-center">
-                    <div>
-                        <h3 class="text-xl font-bold group-hover:text-[#d4af37] transition-colors">{{ servico.nome }}</h3>
-                        <p class="text-gray-500 text-sm">{{ servico.duracao_minutos }} min</p>
+                <div class="dark-card rounded-3xl overflow-hidden shadow-lg shadow-black/50 hover:shadow-[#d4af37]/20 transition-all flex flex-col h-full border border-white/5">
+                    
+                    <!-- Imagem do Serviço -->
+                    <div class="h-48 w-full bg-black relative">
+                        {% if servico.imagem %}
+                            <img src="{{ servico.imagem.url }}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="{{ servico.nome }}">
+                        {% elif 'corte' in servico.nome|lower or 'social' in servico.nome|lower %}
+                            <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=80&w=600&h=400" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Corte">
+                        {% elif 'barba' in servico.nome|lower %}
+                            <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=600&h=400" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Barba">
+                        {% elif 'sobra' in servico.nome|lower %}
+                            <img src="https://images.unsplash.com/photo-1590159763121-7c9daea25efd?auto=format&fit=crop&q=80&w=600&h=400" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Sobrancelha">
+                        {% elif 'topad' in servico.nome|lower or 'combo' in servico.nome|lower %}
+                            <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=600&h=400" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="Combo Topadão">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center bg-gray-900 group-hover:bg-gray-800 transition-colors">
+                                <i class="fa-solid fa-scissors text-4xl text-[#d4af37] opacity-50"></i>
+                            </div>
+                        {% endif %}
+                        <div class="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-[#111] to-transparent"></div>
                     </div>
-                    <div class="text-xl font-bold text-white">
-                        R$ {{ servico.preco }}
+                    
+                    <!-- Detalhes do Serviço -->
+                    <div class="p-6 flex justify-between items-center bg-[#111] flex-grow">
+                        <div>
+                            <h3 class="text-xl font-bold text-white group-hover:text-[#d4af37] transition-colors">{{ servico.nome }}</h3>
+                            <p class="text-gray-500 text-sm mt-1 flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                {{ servico.duracao_minutos }} min
+                            </p>
+                        </div>
+                        <div class="text-lg font-bold text-[#d4af37] bg-[#1a1a1a] px-4 py-2 rounded-xl border border-white/5">
+                            R$ {{ servico.preco }}
+                        </div>
                     </div>
                 </div>
             </a>
